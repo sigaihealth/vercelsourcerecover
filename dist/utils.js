@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.parseStructure = exports.getAuthToken = exports.appendTeamId = void 0;
+exports.processFilesList = exports.parseStructure = exports.getAuthToken = exports.appendTeamId = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -13,59 +13,475 @@ var _fsExtra = _interopRequireDefault(require("fs-extra"));
 
 var _path = require("path");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-const getAuthToken = token => token.includes('Bearer') || token.includes('bearer') ? token[0].toUpperCase() + token.slice(1) : `bearer ${token}`;
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var getAuthToken = function getAuthToken(token) {
+  return token.includes('Bearer') || token.includes('bearer') ? token[0].toUpperCase() + token.slice(1) : "bearer ".concat(token);
+};
 
 exports.getAuthToken = getAuthToken;
 
-const appendTeamId = (url, teamId, symbol = '?') => teamId ? `${url}${symbol}teamId=${teamId}` : url;
+var appendTeamId = function appendTeamId(url, teamId) {
+  var symbol = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '?';
+  return teamId ? "".concat(url).concat(symbol, "teamId=").concat(teamId) : url;
+};
 
 exports.appendTeamId = appendTeamId;
 
-const generateFile = async (fileName, currentPath, env) => {
-  const url = appendTeamId(`${env.DEPLOYMENT_FILE_URL}${fileName}`, env.TEAM_ID, '&');
+var generateFile = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(fileIdentifier, currentPath, env, actualFileName) {
+    var fileName, filePath, normalizedCurrent, normalizedOutput, relativePath, isUid, url, savePath, response, fileContent;
+    return _regeneratorRuntime().wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            // Use actualFileName if provided (for source files with UIDs), otherwise use fileIdentifier
+            fileName = actualFileName || fileIdentifier; // For source files, build the full path from root
+            // Need to include the full path from the deployment root
 
-  try {
-    const savePath = (0, _path.join)(currentPath, fileName);
-    console.log(_colors.default.yellow('Downloading file: '), _colors.default.cyan(fileName), _colors.default.yellow(' to path: '), _colors.default.cyan(savePath));
-    const {
-      data
-    } = await _axios.default.get(url, {
-      responseType: 'stream',
-      headers: {
-        Authorization: env.AUTHORIZATION_TOKEN
+            filePath = fileName; // Get the path relative to the output directory
+            // Need to normalize paths for comparison
+
+            normalizedCurrent = currentPath.replace(/^\.\//, '');
+            normalizedOutput = env.OUTPUT_DIRECTORY.replace(/^\.\//, '');
+            relativePath = '';
+
+            if (normalizedCurrent.startsWith(normalizedOutput)) {
+              relativePath = normalizedCurrent.substring(normalizedOutput.length); // Remove leading slash if present
+
+              if (relativePath.startsWith('/')) {
+                relativePath = relativePath.substring(1);
+              }
+            } // Build the full file path
+
+
+            if (relativePath) {
+              filePath = "".concat(relativePath, "/").concat(fileName);
+            }
+
+            console.log(_colors["default"].gray("  Debug: currentPath=".concat(currentPath, ", outputDir=").concat(env.OUTPUT_DIRECTORY, ", relativePath=").concat(relativePath, ", filePath=").concat(filePath))); // For source files from Vercel, use the v8 API endpoint
+            // We can use either the file UID or the path
+
+            isUid = fileIdentifier.match(/^[a-f0-9]{40}$/);
+
+            if (isUid) {
+              // Use UID-based endpoint for v8 API
+              url = "https://vercel.com/api/v8/deployments/".concat(env.DEPLOYMENT_UID, "/files/").concat(fileIdentifier).concat(env.TEAM_ID ? "?teamId=".concat(env.TEAM_ID) : '');
+            } else {
+              // Use path-based endpoint with the path parameter
+              url = "https://vercel.com/api/v8/deployments/".concat(env.DEPLOYMENT_UID, "/files?path=").concat(encodeURIComponent(filePath)).concat(env.TEAM_ID ? "&teamId=".concat(env.TEAM_ID) : '');
+            }
+
+            console.log(_colors["default"].blue("  Trying URL: ".concat(url, " (").concat(isUid ? 'UID-based' : 'path-based', ")")));
+            savePath = (0, _path.join)(currentPath, fileName);
+            _context.prev = 12;
+
+            if (!(_fsExtra["default"].existsSync(savePath) && _fsExtra["default"].statSync(savePath).isDirectory())) {
+              _context.next = 16;
+              break;
+            }
+
+            console.log(_colors["default"].yellow("Skipping ".concat(fileName, " (directory already exists with this name)")));
+            return _context.abrupt("return");
+
+          case 16:
+            console.log(_colors["default"].yellow('Downloading file: '), _colors["default"].cyan(fileName), _colors["default"].yellow(' to path: '), _colors["default"].cyan(savePath));
+            _context.next = 19;
+            return _axios["default"].get(url, {
+              headers: {
+                Authorization: env.AUTHORIZATION_TOKEN
+              }
+            });
+
+          case 19:
+            response = _context.sent;
+
+            if (response.data && _typeof(response.data) === 'object' && response.data.data) {
+              // If response contains base64 encoded data
+              fileContent = Buffer.from(response.data.data, 'base64');
+
+              _fsExtra["default"].writeFileSync(savePath, fileContent);
+            } else if (typeof response.data === 'string') {
+              // If response is a string (might be base64)
+              try {
+                fileContent = Buffer.from(response.data, 'base64');
+
+                _fsExtra["default"].writeFileSync(savePath, fileContent);
+              } catch (_unused) {
+                // If not base64, write as is
+                _fsExtra["default"].writeFileSync(savePath, response.data);
+              }
+            } else {
+              // Direct file content
+              _fsExtra["default"].writeFileSync(savePath, response.data);
+            }
+
+            console.log(_colors["default"].green("  Successfully downloaded ".concat(fileName)));
+            _context.next = 27;
+            break;
+
+          case 24:
+            _context.prev = 24;
+            _context.t0 = _context["catch"](12);
+
+            if (_context.t0.response && _context.t0.response.status === 404) {
+              console.log(_colors["default"].yellow("Skipping ".concat(fileName, " (404 - file not found)")));
+              console.log(_colors["default"].yellow("  Tried URL: ".concat(url)));
+            } else if (_context.t0.response && _context.t0.response.status === 410) {
+              console.log(_colors["default"].yellow("Skipping ".concat(fileName, " (410 - gone/unavailable)")));
+              console.log(_colors["default"].yellow("  This might be a compiled file or lambda function"));
+            } else {
+              console.log(_colors["default"].red("Cannot download ".concat(fileName, ". Error: ").concat(_context.t0.message)));
+
+              if (_context.t0.response) {
+                console.log(_colors["default"].red("  Status: ".concat(_context.t0.response.status))); // Don't try to stringify the entire response data, it might have circular references
+
+                if (_context.t0.response.data && _typeof(_context.t0.response.data) === 'object') {
+                  console.log(_colors["default"].red("  Data: ".concat(_context.t0.response.data.error || _context.t0.response.data.message || 'No error message')));
+                }
+              }
+
+              console.log(_colors["default"].red("  URL: ".concat(url)));
+            }
+
+          case 27:
+          case "end":
+            return _context.stop();
+        }
       }
-    });
-    data.pipe(_fsExtra.default.createWriteStream(savePath));
-  } catch (err) {
-    console.log(_colors.default.red(`Cannot download from ${url}. Please raise an issue here: https://github.com/CalinaCristian/source-from-vercel-deployment/issues !`));
-    process.exit();
-  }
-};
+    }, _callee, null, [[12, 24]]);
+  }));
 
-const generateDirectory = path => {
+  return function generateFile(_x, _x2, _x3, _x4) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+var generateDirectory = function generateDirectory(path) {
   try {
-    _fsExtra.default.mkdirpSync(path);
+    _fsExtra["default"].mkdirpSync(path);
   } catch (err) {
-    console.log(_colors.default.red(`Cannot write directory on path: ${path} !`));
+    console.log(_colors["default"].red("Cannot write directory on path: ".concat(path, " !")));
     process.exit();
   }
 };
 
-const parseCurrent = (node, currentPath, env) => {
-  if (node.type === 'directory') {
-    generateDirectory((0, _path.join)(currentPath, node.name));
-    parseStructure(node.children, (0, _path.join)(currentPath, node.name), env);
-  } else if (node.type === 'file') {
-    generateFile(node.name, currentPath, env);
-  }
-};
+var parseCurrent = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(node, currentPath, env) {
+    var fileIdentifier;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            if (!(!node || !node.name)) {
+              _context2.next = 3;
+              break;
+            }
 
-const parseStructure = (folderStructure, currentPath, env) => {
-  if (folderStructure) {
-    folderStructure.forEach(structure => parseCurrent(structure, currentPath, env));
-  }
-};
+            console.log(_colors["default"].yellow('Skipping invalid node without name'));
+            return _context2.abrupt("return");
+
+          case 3:
+            if (!(node.name === 'out')) {
+              _context2.next = 6;
+              break;
+            }
+
+            console.log(_colors["default"].yellow("Skipping 'out' directory and all its contents"));
+            return _context2.abrupt("return");
+
+          case 6:
+            console.log(_colors["default"].cyan("Processing: ".concat(node.name, " (type: ").concat(node.type, ", uid: ").concat(node.uid || 'none', ", has children: ").concat(!!node.children, ")"))); // Skip lambda functions and edge functions
+
+            if (!(node.type === 'lambda' || node.type === 'edge')) {
+              _context2.next = 10;
+              break;
+            }
+
+            console.log(_colors["default"].yellow("  Skipping ".concat(node.type, " function: ").concat(node.name)));
+            return _context2.abrupt("return");
+
+          case 10:
+            if (!(node.type === 'directory' || node.children)) {
+              _context2.next = 21;
+              break;
+            }
+
+            generateDirectory((0, _path.join)(currentPath, node.name));
+
+            if (!(node.children && Array.isArray(node.children))) {
+              _context2.next = 18;
+              break;
+            }
+
+            console.log(_colors["default"].yellow("  Processing ".concat(node.children.length, " children of ").concat(node.name)));
+            _context2.next = 16;
+            return parseStructure(node.children, (0, _path.join)(currentPath, node.name), env);
+
+          case 16:
+            _context2.next = 19;
+            break;
+
+          case 18:
+            console.log(_colors["default"].red("  No children array found for directory ".concat(node.name)));
+
+          case 19:
+            _context2.next = 29;
+            break;
+
+          case 21:
+            if (!(node.type === 'file')) {
+              _context2.next = 28;
+              break;
+            }
+
+            // For source files, we need to use the UID if available
+            fileIdentifier = node.uid || node.name;
+            console.log(_colors["default"].green("  Attempting to download file: ".concat(node.name, " with uid: ").concat(node.uid)));
+            _context2.next = 26;
+            return generateFile(fileIdentifier, currentPath, env, node.name);
+
+          case 26:
+            _context2.next = 29;
+            break;
+
+          case 28:
+            console.log(_colors["default"].yellow("Unknown node type '".concat(node.type, "' for ").concat(node.name, ", skipping")));
+
+          case 29:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+
+  return function parseCurrent(_x5, _x6, _x7) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+var parseStructure = /*#__PURE__*/function () {
+  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(folderStructure, currentPath, env) {
+    var _iterator, _step, structure;
+
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            if (!folderStructure) {
+              _context3.next = 18;
+              break;
+            }
+
+            _iterator = _createForOfIteratorHelper(folderStructure);
+            _context3.prev = 2;
+
+            _iterator.s();
+
+          case 4:
+            if ((_step = _iterator.n()).done) {
+              _context3.next = 10;
+              break;
+            }
+
+            structure = _step.value;
+            _context3.next = 8;
+            return parseCurrent(structure, currentPath, env);
+
+          case 8:
+            _context3.next = 4;
+            break;
+
+          case 10:
+            _context3.next = 15;
+            break;
+
+          case 12:
+            _context3.prev = 12;
+            _context3.t0 = _context3["catch"](2);
+
+            _iterator.e(_context3.t0);
+
+          case 15:
+            _context3.prev = 15;
+
+            _iterator.f();
+
+            return _context3.finish(15);
+
+          case 18:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3, null, [[2, 12, 15, 18]]);
+  }));
+
+  return function parseStructure(_x8, _x9, _x10) {
+    return _ref3.apply(this, arguments);
+  };
+}(); // Process a flat list of files (for source files API)
+
 
 exports.parseStructure = parseStructure;
+
+var processFilesList = /*#__PURE__*/function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(filesList, outputDirectory, env) {
+    var sourceFiles, _iterator2, _step2, file, parts, fileName, dirPath, filePath, _parts, _fileName, _dirPath, fileIdentifier, _parts2, _fileName2, _dirPath2;
+
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            if (!(!filesList || !Array.isArray(filesList))) {
+              _context4.next = 2;
+              break;
+            }
+
+            return _context4.abrupt("return");
+
+          case 2:
+            // Filter out 'out' directory files - only keep source files
+            sourceFiles = filesList.filter(function (file) {
+              var path = file.file || file.name || file;
+              return !path.toString().startsWith('out/');
+            });
+            console.log(_colors["default"].cyan("Processing ".concat(sourceFiles.length, " source files (filtered from ").concat(filesList.length, " total)...")));
+            _iterator2 = _createForOfIteratorHelper(sourceFiles);
+            _context4.prev = 5;
+
+            _iterator2.s();
+
+          case 7:
+            if ((_step2 = _iterator2.n()).done) {
+              _context4.next = 39;
+              break;
+            }
+
+            file = _step2.value;
+
+            if (!(typeof file === 'string')) {
+              _context4.next = 18;
+              break;
+            }
+
+            // Simple file path
+            parts = file.split('/');
+            fileName = parts.pop();
+            dirPath = _path.join.apply(void 0, [outputDirectory].concat(_toConsumableArray(parts))); // Create directory structure
+
+            if (parts.length > 0) {
+              _fsExtra["default"].mkdirpSync(dirPath);
+            } // Download file
+
+
+            _context4.next = 16;
+            return generateFile(file, outputDirectory, env);
+
+          case 16:
+            _context4.next = 37;
+            break;
+
+          case 18:
+            if (!file.file) {
+              _context4.next = 30;
+              break;
+            }
+
+            // v2 API format: {file: "path/to/file", sha: "...", mode: "...", uid: "..."}
+            filePath = file.file;
+            _parts = filePath.split('/');
+            _fileName = _parts.pop();
+            _dirPath = _path.join.apply(void 0, [outputDirectory].concat(_toConsumableArray(_parts)));
+            console.log(_colors["default"].green("  Processing file: ".concat(filePath, " (uid: ").concat(file.uid, ")"))); // Create directory structure
+
+            if (_parts.length > 0) {
+              _fsExtra["default"].mkdirpSync(_dirPath);
+            } // Download file using UID
+
+
+            fileIdentifier = file.uid || filePath;
+            _context4.next = 28;
+            return generateFile(fileIdentifier, _dirPath, env, _fileName);
+
+          case 28:
+            _context4.next = 37;
+            break;
+
+          case 30:
+            if (!file.name) {
+              _context4.next = 37;
+              break;
+            }
+
+            // Alternative format with name property
+            _parts2 = file.name.split('/');
+            _fileName2 = _parts2.pop();
+            _dirPath2 = _path.join.apply(void 0, [outputDirectory].concat(_toConsumableArray(_parts2))); // Create directory structure
+
+            if (_parts2.length > 0) {
+              _fsExtra["default"].mkdirpSync(_dirPath2);
+            } // Download file
+
+
+            _context4.next = 37;
+            return generateFile(file.uid || file.name, _dirPath2, env, _fileName2);
+
+          case 37:
+            _context4.next = 7;
+            break;
+
+          case 39:
+            _context4.next = 44;
+            break;
+
+          case 41:
+            _context4.prev = 41;
+            _context4.t0 = _context4["catch"](5);
+
+            _iterator2.e(_context4.t0);
+
+          case 44:
+            _context4.prev = 44;
+
+            _iterator2.f();
+
+            return _context4.finish(44);
+
+          case 47:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, _callee4, null, [[5, 41, 44, 47]]);
+  }));
+
+  return function processFilesList(_x11, _x12, _x13) {
+    return _ref4.apply(this, arguments);
+  };
+}();
+
+exports.processFilesList = processFilesList;

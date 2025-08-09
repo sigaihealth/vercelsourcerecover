@@ -15,6 +15,7 @@ import {
   appendTeamId,
   getAuthToken,
   parseStructure,
+  processFilesList,
 } from './utils';
 
 const getTeamId = async(token) => {
@@ -70,13 +71,19 @@ const getDeployment = async (env) => {
   console.log(colors.yellow('Getting list of deployments...This might take a while...'));
   const { deploymentUid, deploymentUrl } = await getDeployment(env);
 
-  env.DEPLOYMENT_URL = `https://vercel.com/api/file-tree/${deploymentUrl}?base=out`;
-  env.DEPLOYMENT_FILE_URL = `https://vercel.com/api/v6/deployments/${deploymentUid}/files/outputs?file=`;
+  // Try to get source files instead of output files
+  // The file-tree endpoint needs the slug parameter to get the full tree
+  env.DEPLOYMENT_URL = `https://vercel.com/api/v2/deployments/${deploymentUid}/files`;  
+  // Try the source file endpoint
+  env.DEPLOYMENT_FILE_URL = `https://vercel.com/api/v2/now/files/`;
+  env.DEPLOYMENT_UID = deploymentUid;
 
   env.OUTPUT_DIRECTORY = await promptForOutputDirectory() || env.OUTPUT_DIRECTORY;
 
   console.log(colors.yellow('Starting the process of recreating the structure...'));
-  const getDeploymentStructureURL = appendTeamId(env.DEPLOYMENT_URL, env.TEAM_ID, '&');
+  const getDeploymentStructureURL = appendTeamId(env.DEPLOYMENT_URL, env.TEAM_ID, '?');
+  
+  console.log(colors.cyan('Fetching file tree from:', getDeploymentStructureURL));
 
   try {
     const { data } = await axios.get(getDeploymentStructureURL, {
@@ -85,9 +92,25 @@ const getDeployment = async (env) => {
       }
     });
 
+    console.log(colors.cyan('API Response:'), JSON.stringify(data).substring(0, 500));
+    
     mkdirp(env.OUTPUT_DIRECTORY);
-    parseStructure(data, env.OUTPUT_DIRECTORY, env);
+    
+    // Check different response formats
+    if (data.files) {
+      // v2 API returns {files: [...]}
+      console.log(colors.yellow(`Processing ${data.files.length} files from files array...`));
+      await processFilesList(data.files, env.OUTPUT_DIRECTORY, env);
+    } else if (Array.isArray(data)) {
+      console.log(colors.yellow(`Processing ${data.length} top-level items...`));
+      // Process as tree structure - the array contains directory/file nodes
+      await parseStructure(data, env.OUTPUT_DIRECTORY, env);
+    } else {
+      // Single tree structure
+      await parseStructure(data, env.OUTPUT_DIRECTORY, env);
+    }
   } catch (err) {
+    console.log('Error details:', err.response?.status, err.response?.data);
     console.log(err.message);
     console.log(colors.red('Cannot recreate the file tree. Please raise an issue here: https://github.com/CalinaCristian/source-from-vercel-deployment/issues !'));
     process.exit(0);
