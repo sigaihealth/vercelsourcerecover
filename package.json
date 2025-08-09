@@ -1,7 +1,7 @@
 {
-  "name": "source-from-vercel-deployment",
-  "version": "4.1.0",
-  "description": "A simple package made for downloading the source code from your Vercel Deployment.",
+  "name": "vercel-source-recovery",
+  "version": "1.0.0",
+  "description": "Download and recover source files from your Vercel deployments. Uses Vercel API v8 for reliable source code recovery.",
   "main": "dist/index.js",
   "scripts": {
     "start": "npm run build && node dist/index.js",
@@ -22,7 +22,7 @@
       "^.*\\((.*)\\): (.*)": "* **$1** $2"
     }
   },
-  "author": "Cristian Calina",
+  "author": "Cristian Calina, sigaihealth",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
@@ -41,21 +41,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CalinaCristian/source-from-vercel-deployment.git"
+    "url": "git+https://github.com/sigaihealth/vercelsourcerecover.git"
   },
   "bin": {
-    "source-from-vercel-deployment": "dist/index.js"
+    "vercel-source-recovery": "dist/index.js"
   },
   "keywords": [
     "vercel",
     "deployment",
     "download",
-    "download-vercel-deployment",
-    "next",
-    "vercel-deployment"
+    "source",
+    "recovery",
+    "backup",
+    "vercel-api",
+    "vercel-deployment",
+    "source-code",
+    "disaster-recovery",
+    "vercel-backup",
+    "code-recovery"
   ],
   "bugs": {
-    "url": "https://github.com/CalinaCristian/source-from-vercel-deployment/issues"
+    "url": "https://github.com/sigaihealth/vercelsourcerecover/issues"
   },
-  "homepage": "https://github.com/CalinaCristian/source-from-vercel-deployment#readme"
+  "homepage": "https://github.com/sigaihealth/vercelsourcerecover#readme"
 }
