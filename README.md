@@ -1,8 +1,8 @@
-# source-from-vercel-deployment
+# vercel-source-recovery
 
 Download source files from your Vercel deployments. This tool allows you to recover your source code directly from Vercel deployments when you need to retrieve your files.
 
-[![npm version](https://img.shields.io/npm/v/source-from-vercel-deployment.svg)](https://www.npmjs.com/package/source-from-vercel-deployment)
+[![npm version](https://img.shields.io/npm/v/vercel-source-recovery.svg)](https://www.npmjs.com/package/vercel-source-recovery)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🚀 Features
@@ -19,24 +19,24 @@ Download source files from your Vercel deployments. This tool allows you to reco
 
 ### Global Installation (Recommended)
 ```bash
-npm install -g source-from-vercel-deployment
+npm install -g vercel-source-recovery
 ```
 
 ### Using npx (No Installation)
 ```bash
-npx source-from-vercel-deployment
+npx vercel-source-recovery
 ```
 
 ### Local Installation
 ```bash
-npm install source-from-vercel-deployment
+npm install vercel-source-recovery
 ```
 
 ## 🎯 Quick Start
 
 Simply run:
 ```bash
-source-from-vercel-deployment
+vercel-source-recovery
 ```
 
 The interactive CLI will guide you through:
